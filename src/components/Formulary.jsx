@@ -1,17 +1,34 @@
-import { Button, Form, Row, Col } from 'react-bootstrap'
+import { Button, Form, Row, Col, Alert } from 'react-bootstrap'
 import useCategories from '../hooks/useCategories'
 import { useState } from 'react'
-
+import useDrinks from '../hooks/useDrinks'
 const Formulary = () => {
 
+  const { getDrinks } = useDrinks()
+  const [ alert, setAlert ] = useState()
   const { categories, getId } = useCategories()
-  const [Search, setSearch] = useState({
+  const [search, setSearch] = useState({
     name: '',
     category: ''
   })
+
+  const handleSubmit = e => {
+    e.preventDefault()
+
+    if(Object.values(search).includes('')){
+      setAlert('Acción denegada: Todos los campos son obligatorios.')
+      return
+    }
+    setAlert('')
+    getDrinks(search)
+
+  }
  
   return (
-    <Form>
+    <Form
+      onSubmit={handleSubmit}
+    >
+      {alert && <Alert variant='danger' className='text-center'>{alert}</Alert>}
       <Row>
         <Col md={6}>
           <Form.Group className='mb-3'>
@@ -21,9 +38,9 @@ const Formulary = () => {
               type='text'
               placeholder='Ej: Tequila, Vodka, etc'
               name='name'
-              value={Search.name}
+              value={search.name}
               onChange={e => setSearch({
-                ...Search,
+                ...search,
                 [e.target.name]: e.target.value
               })}
 
@@ -36,9 +53,9 @@ const Formulary = () => {
             <Form.Select
               id='category'
               name='category'
-              value={Search.category}
+              value={search.category}
               onChange={e => setSearch({
-                ...Search,
+                ...search,
                 [e.target.name]: e.target.value
               })}
             >
@@ -62,6 +79,7 @@ const Formulary = () => {
           <Button
             variant='outline-danger'
             className='text-uppercase w-100'
+            type='Submit'
           >
             Buscar bebidas
           </Button>
